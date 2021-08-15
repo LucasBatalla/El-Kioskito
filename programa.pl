@@ -35,9 +35,10 @@ foreverAlone(Persona, Dia, Hora):-
 
 
 posibilidadesDeAtencion(Dia, Personas):-
+    between(0, 24, Horario),
     atiende(_,Dia,_),
-    findall(Persona, atiende(Persona, Dia, _), Personas).
-
+    findall(Persona, atencion(Persona,Dia,Horario), Personas).
+    
 
 
 puedenAtenderJuntos(Persona,Persona1):-
@@ -66,69 +67,43 @@ ventas(martu, dia(miercoles,12,agosto), golosinas(1000)).
 ventas(martu, dia(miercoles,12,agosto), cigarillos([chesterfield,colorado,parisiennes])).
 
 
+
 ventas(lucas, dia(martes,11,agosto), golosinas(600)).
 ventas(lucas, dia(martes,11,agosto), bebidas(2, no)).
 ventas(lucas, dia(martes,11,agosto), cigarillos([derby])).
 
-
 suertuda(Persona):-
     atiende(Persona,_,_),
-    forall(primeraVentaDelDia(Persona, dia(Dia,_,_),Venta), ventaImportante(Venta)).
+    forall(vendio(Persona,Dia),(primeraVentaDelDia(Persona,Dia,PrimerVenta), ventaImportante(PrimerVenta))).
+  
 
+vendio(Persona, dia(Dia, Nro, Mes)):-
+    ventas(Persona, dia(Dia,Nro,Mes), _).
 
+primeraVentaDelDia(Persona, dia(Dia,Nro,Mes), PrimerVenta):-
+    vendio(Persona, dia(Dia, Nro,Mes)),
+    findall(Venta, ventas(Persona, dia(Dia,Nro,Mes), Venta), Ventas),
+    primerVenta(Ventas, PrimerVenta).
 
-primeraVentaDelDia(Persona, dia(Dia, Nro, Mes), Venta):-
-    primeraVentaDeGolosina(Persona, dia(Dia,Nro,Mes), Venta).
+primerVenta(Ventas, Venta):-
+     Ventas = [PrimerVenta |_],
+     Venta = PrimerVenta.
+ventaImportante(golosinas(Precio)):-
+    Precio > 100.
 
-
-primeraVentaDelDia(Persona, dia(Dia, Nro, Mes), Venta):-
-    primeraVentaDeCigarillo(Persona, dia(Dia,Nro,Mes), Venta).
-
-primeraVentaDelDia(Persona, dia(Dia, Nro, Mes), Venta):-
-    primeraVentaDeBebida(Persona, dia(Dia,Nro,Mes), Venta).
-
-primeraVentaDelDia(Persona, dia(Dia, Nro, Mes), Venta):-
-    primeraVentaDeBebidaAlcoholica(Persona, dia(Dia,Nro,Mes), Venta).
-
-primeraVentaDeGolosina(Persona, dia(Dia,Nro,Mes), Monto):-
-    ventas(Persona, dia(Dia,Nro,Mes), _),
-    findall(Venta, ventas(Persona, dia(Dia,Nro,Mes),golosinas(Venta)), Ventas),
-    member(Monto, Ventas).
-
-primeraVentaDeCigarillo(Persona, dia(Dia,Nro,Mes), Cigarillos):-
-    ventas(Persona, dia(Dia,Nro,Mes), _),
-    findall(Cigarillo, ventas(Persona, dia(Dia,Nro,Mes),cigarillos(Cigarillo)), Ventas),
-    member(Cigarillos, Ventas).
-
-primeraVentaDeBebidaAlcoholica(Persona, dia(Dia,Nro,Mes), Bebidas):-
-    ventas(Persona, dia(Dia,Nro,Mes), _),
-    findall(Bebida,ventas(Persona, dia(Dia,Nro,Mes),bebidas(Bebida,si)), Ventas),
-    member(Bebidas, Ventas).
-
-primeraVentaDeBebida(Persona, dia(Dia,Nro,Mes), Bebidas):-
-    ventas(Persona, dia(Dia,Nro,Mes), _),
-    findall(Bebida,ventas(Persona, dia(Dia,Nro,Mes),bebidas(Bebida,no)), Ventas),
-    member(Bebidas, Ventas).
-
-ventaImportante(cigarillos(Venta)):-
-    length(Venta, Cant),
+ventaImportante(cigarillos(Vendidos)):-
+    length(Vendidos, Cant),
     Cant > 2.
 
-ventaImportante(golosinas(Venta)):-
-    Venta > 100.
-
-ventaImportante(Bebida):-
-    member(Cant, Bebida),
+ventaImportante(bebidas(Cant,no)):-
     Cant > 5.
-    
-podrianEstarAtendiendo(Persona,OtraPersona,Dia):-
-    atiendenEnElMismoDia(Persona,OtraPersona,Dia).
-    
-    
-atiendenEnElMismoDia(Persona,OtraPersona,Dia):-
-    atiende(Persona,Dia,_),
-    atiende(OtraPersona,Dia,_),
-    Persona \= OtraPersona.
+
+ventaImportante(bebidas(_,si)).
+
+
+
+
+
 
 
     
