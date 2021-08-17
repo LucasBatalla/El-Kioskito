@@ -69,11 +69,11 @@ ventas(martu, dia(miercoles,12,agosto), cigarillos([chesterfield,colorado,parisi
 
 
 ventas(lucas, dia(martes,11,agosto), golosinas(600)).
-ventas(lucas, dia(martes,11,agosto), bebidas(2, no)).
-ventas(lucas, dia(martes,11,agosto), cigarillos([derby])).
+ventas(lucas, dia(martes,18,agosto), bebidas(2, no)).
+ventas(lucas, dia(martes,18,agosto), cigarillos([derby])).
 
 suertuda(Persona):-
-    atiende(Persona,_,_),
+    vendio(Persona,_),
     forall(vendio(Persona,Dia),(primeraVentaDelDia(Persona,Dia,PrimerVenta), ventaImportante(PrimerVenta))).
   
 
